@@ -1,0 +1,10 @@
+# IDE / Editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Local SQLite databases
+*.db
+*.db-journal

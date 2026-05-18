@@ -1,0 +1,22 @@
+# Binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+awesomeProject
+goalsync-backend
+
+# Environments
+.env
+
+# Database
+*.db
+*.db-journal
+
+# Dependency directories
+vendor/
+
+# IDEs
+.idea/
+.vscode/
