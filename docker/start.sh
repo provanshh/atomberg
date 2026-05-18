@@ -13,22 +13,11 @@ fi
 
 su - postgres -c "${POSTGRES_BIN}/pg_ctl -D '${POSTGRES_DATA_DIR}' -o \"-c listen_addresses='127.0.0.1'\" -w start"
 
-su - postgres -c "psql -v ON_ERROR_STOP=1 <<SQL
-DO $$
-BEGIN
-  IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = '${POSTGRES_USER}') THEN
-    CREATE ROLE ${POSTGRES_USER} LOGIN PASSWORD '${POSTGRES_PASSWORD}';
-  END IF;
-END
-$$;
-DO $$
-BEGIN
-  IF NOT EXISTS (SELECT FROM pg_database WHERE datname = '${POSTGRES_DB}') THEN
-    CREATE DATABASE ${POSTGRES_DB} OWNER ${POSTGRES_USER};
-  END IF;
-END
-$$;
-SQL"
+POSTGRES_ROLE_SQL="DO $$\nBEGIN\n  IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = '${POSTGRES_USER}') THEN\n    CREATE ROLE ${POSTGRES_USER} LOGIN PASSWORD '${POSTGRES_PASSWORD}';\n  END IF;\nEND\n$$;"
+POSTGRES_DB_SQL="DO $$\nBEGIN\n  IF NOT EXISTS (SELECT FROM pg_database WHERE datname = '${POSTGRES_DB}') THEN\n    CREATE DATABASE ${POSTGRES_DB} OWNER ${POSTGRES_USER};\n  END IF;\nEND\n$$;"
+
+su - postgres -c "psql -v ON_ERROR_STOP=1 -c \"${POSTGRES_ROLE_SQL}\""
+su - postgres -c "psql -v ON_ERROR_STOP=1 -c \"${POSTGRES_DB_SQL}\""
 
 export DATABASE_URL="${DATABASE_URL:-postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost:5432/${POSTGRES_DB}?sslmode=disable}"
 
