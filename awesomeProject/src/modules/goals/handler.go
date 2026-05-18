@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"awesomeProject/src/models"
 	"awesomeProject/src/services"
 	"awesomeProject/src/utils"
 	"awesomeProject/src/validations"
