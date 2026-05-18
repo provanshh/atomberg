@@ -23,6 +23,12 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends postgresql \
+  && rm -rf /var/lib/apt/lists/* \
+  && mkdir -p /var/lib/postgresql/data \
+  && chown -R postgres:postgres /var/lib/postgresql
+
 COPY --from=backend-builder /out/goalsync /app/goalsync
 COPY --from=frontend-builder /app/remix-of-goalsync-ascent /app/frontend
 COPY docker/start.sh /app/start.sh
