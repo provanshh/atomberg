@@ -9,27 +9,27 @@ import (
 )
 
 type Config struct {
-	Port                 string
-	DatabaseURL          string
-	JWTSecret            string
-	AccessTokenTTL       time.Duration
-	RefreshTokenTTL      time.Duration
-	CookieSecure         bool
-	FrontendOrigin       string
-	RateLimitPerMinute   int
+	Port               string
+	DatabaseURL        string
+	JWTSecret          string
+	AccessTokenTTL     time.Duration
+	RefreshTokenTTL    time.Duration
+	CookieSecure       bool
+	FrontendOrigin     string
+	RateLimitPerMinute int
 }
 
 func Load() Config {
 	loadDotEnv()
 	return Config{
-		Port:                 env("PORT", "8080"),
-		DatabaseURL:          env("DATABASE_URL", "postgres://postgres:postgres@localhost:5432/goalsync?sslmode=disable"),
-		JWTSecret:            env("JWT_SECRET", "dev-secret-change-me"),
-		AccessTokenTTL:       envDuration("ACCESS_TOKEN_TTL", "15m"),
-		RefreshTokenTTL:      envDuration("REFRESH_TOKEN_TTL", "168h"),
-		CookieSecure:         envBool("COOKIE_SECURE", false),
-		FrontendOrigin:       env("FRONTEND_ORIGIN", "http://localhost:3000"),
-		RateLimitPerMinute:   envInt("RATE_LIMIT_PER_MIN", 120),
+		Port:               env("PORT", "8080"),
+		DatabaseURL:        env("DATABASE_URL", "sqlite:goalsync.db"),
+		JWTSecret:          env("JWT_SECRET", "dev-secret-change-me"),
+		AccessTokenTTL:     envDuration("ACCESS_TOKEN_TTL", "15m"),
+		RefreshTokenTTL:    envDuration("REFRESH_TOKEN_TTL", "168h"),
+		CookieSecure:       envBool("COOKIE_SECURE", false),
+		FrontendOrigin:     env("FRONTEND_ORIGIN", "http://localhost:3000"),
+		RateLimitPerMinute: envInt("RATE_LIMIT_PER_MIN", 120),
 	}
 }
 
