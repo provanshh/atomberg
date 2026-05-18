@@ -25,14 +25,25 @@ export function KpiCard({ label, value, delta, hint, icon, accent = "primary" }:
           <div className="text-xs text-muted-foreground font-medium">{label}</div>
           <div className="mt-2 text-3xl font-semibold tracking-tight">{value}</div>
         </div>
-        {icon && <div className={cn("h-9 w-9 rounded-xl grid place-items-center", accentMap[accent])}>{icon}</div>}
+        {icon && (
+          <div className={cn("h-9 w-9 rounded-xl grid place-items-center", accentMap[accent])}>
+            {icon}
+          </div>
+        )}
       </div>
       <div className="mt-3 flex items-center gap-2 text-xs">
         {typeof delta === "number" && (
-          <span className={cn("inline-flex items-center gap-0.5 rounded-md px-1.5 py-0.5 font-medium",
-            delta >= 0 ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive")}
+          <span
+            className={cn(
+              "inline-flex items-center gap-0.5 rounded-md px-1.5 py-0.5 font-medium",
+              delta >= 0 ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive",
+            )}
           >
-            {delta >= 0 ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
+            {delta >= 0 ? (
+              <ArrowUpRight className="h-3 w-3" />
+            ) : (
+              <ArrowDownRight className="h-3 w-3" />
+            )}
             {Math.abs(delta)}%
           </span>
         )}

@@ -7,7 +7,10 @@ const KEY = "goalsync:theme";
 export function useTheme() {
   const [theme, setTheme] = useState<"light" | "dark">("dark");
   useEffect(() => {
-    const saved = (typeof window !== "undefined" && localStorage.getItem(KEY)) as "light" | "dark" | null;
+    const saved = (typeof window !== "undefined" && localStorage.getItem(KEY)) as
+      | "light"
+      | "dark"
+      | null;
     const initial = saved ?? "dark";
     setTheme(initial);
     document.documentElement.classList.toggle("dark", initial === "dark");
@@ -16,7 +19,11 @@ export function useTheme() {
     const next = theme === "dark" ? "light" : "dark";
     setTheme(next);
     document.documentElement.classList.toggle("dark", next === "dark");
-    try { localStorage.setItem(KEY, next); } catch {}
+    try {
+      localStorage.setItem(KEY, next);
+    } catch (err) {
+      console.debug("Theme persistence failed", err);
+    }
   };
   return { theme, toggle };
 }
@@ -24,7 +31,13 @@ export function useTheme() {
 export function ThemeToggle() {
   const { theme, toggle } = useTheme();
   return (
-    <Button variant="ghost" size="icon" onClick={toggle} className="relative group" aria-label="Toggle theme">
+    <Button
+      variant="ghost"
+      size="icon"
+      onClick={toggle}
+      className="relative group"
+      aria-label="Toggle theme"
+    >
       {theme === "dark" ? (
         <Sun className="h-4 w-4 transition-transform group-hover:rotate-45" />
       ) : (

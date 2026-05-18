@@ -59,7 +59,13 @@ export interface AuditLog {
   timestamp: string;
 }
 
-export type NotificationType = "submit" | "approve" | "reject" | "reminder" | "escalation" | "shared";
+export type NotificationType =
+  | "submit"
+  | "approve"
+  | "reject"
+  | "reminder"
+  | "escalation"
+  | "shared";
 
 export interface AppNotification {
   id: string;

@@ -14,5 +14,9 @@ const MAP: Record<string, string> = {
 };
 
 export function StatusBadge({ status }: { status: string }) {
-  return <Badge variant="secondary" className={cn("capitalize border-0 font-medium", MAP[status] ?? "")}>{status.replace("-", " ")}</Badge>;
+  return (
+    <Badge variant="secondary" className={cn("capitalize border-0 font-medium", MAP[status] ?? "")}>
+      {status.replace("-", " ")}
+    </Badge>
+  );
 }

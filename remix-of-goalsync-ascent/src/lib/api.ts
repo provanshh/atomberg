@@ -1,6 +1,26 @@
-import type { AppNotification, AuditLog, CheckIn, Goal, GoalStatus, ProgressStatus, Role, UoMType, User, NotificationType } from "./types";
+import type {
+  AppNotification,
+  AuditLog,
+  CheckIn,
+  Goal,
+  GoalStatus,
+  ProgressStatus,
+  Role,
+  UoMType,
+  User,
+  NotificationType,
+} from "./types";
 
 const API_BASE = "http://localhost:8080";
+
+type BackendRecord = Record<string, unknown>;
+
+function asRecord(value: unknown): BackendRecord | null {
+  if (value && typeof value === "object" && !Array.isArray(value)) {
+    return value as BackendRecord;
+  }
+  return null;
+}
 
 function progressStatusFor(pct: number): ProgressStatus {
   if (pct >= 100) return "completed";
@@ -9,22 +29,26 @@ function progressStatusFor(pct: number): ProgressStatus {
   return "not-started";
 }
 
-export function mapUser(b: any): User {
-  if (!b) return null as any;
+export function mapUser(b: unknown): User {
+  const record = asRecord(b);
+  if (!record) return null as unknown as User;
   return {
-    id: String(b.id),
-    name: b.name,
-    email: b.email,
-    role: (b.role || "EMPLOYEE").toLowerCase() as Role,
-    department: b.department || "",
-    designation: b.designation || "",
-    managerId: b.manager_id ? String(b.manager_id) : null,
-    avatar: b.avatar_url || "",
-    createdAt: b.created_at ? new Date(b.created_at).toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10),
+    id: String(record.id),
+    name: String(record.name ?? ""),
+    email: String(record.email ?? ""),
+    role: String(record.role ?? "EMPLOYEE").toLowerCase() as Role,
+    department: String(record.department ?? ""),
+    designation: String(record.designation ?? ""),
+    managerId: record.manager_id ? String(record.manager_id) : null,
+    avatar: String(record.avatar_url ?? ""),
+    createdAt: record.created_at
+      ? new Date(String(record.created_at)).toISOString().slice(0, 10)
+      : new Date().toISOString().slice(0, 10),
   };
 }
 
-export function mapGoal(b: any): Goal {
+export function mapGoal(b: unknown): Goal {
+  const record = asRecord(b) ?? {};
   const uomMapBack: Record<string, UoMType> = {
     MIN: "numeric",
     MAX: "percentage",
@@ -32,34 +56,34 @@ export function mapGoal(b: any): Goal {
     ZERO_BASED: "zero-based",
   };
   return {
-    id: String(b.id),
-    employeeId: String(b.employee_id),
-    thrustArea: b.thrust_area,
-    title: b.title,
-    description: b.description || "",
-    uomType: uomMapBack[b.uom_type] || "numeric",
-    target: b.target_value,
-    achievement: b.achievement_value || 0,
-    weightage: b.weightage,
-    progressPercentage: b.progress_percentage || 0,
-    status: (b.status || "DRAFT").toLowerCase() as GoalStatus,
-    progressStatus: progressStatusFor(b.progress_percentage || 0),
-    isLocked: b.is_locked || false,
+    id: String(record.id),
+    employeeId: String(record.employee_id),
+    thrustArea: String(record.thrust_area ?? ""),
+    title: String(record.title ?? ""),
+    description: String(record.description ?? ""),
+    uomType: uomMapBack[String(record.uom_type)] || "numeric",
+    target: Number(record.target_value ?? 0),
+    achievement: Number(record.achievement_value ?? 0),
+    weightage: Number(record.weightage ?? 0),
+    progressPercentage: Number(record.progress_percentage ?? 0),
+    status: String(record.status ?? "DRAFT").toLowerCase() as GoalStatus,
+    progressStatus: progressStatusFor(Number(record.progress_percentage ?? 0)),
+    isLocked: Boolean(record.is_locked),
     isShared: false,
-    managerComment: b.manager_comment || "",
-    createdAt: b.created_at || new Date().toISOString(),
-    updatedAt: b.updated_at || new Date().toISOString(),
+    managerComment: String(record.manager_comment ?? ""),
+    createdAt: String(record.created_at ?? new Date().toISOString()),
+    updatedAt: String(record.updated_at ?? new Date().toISOString()),
   };
 }
 
-export function mapGoalForBackend(f: Partial<Goal>) {
+export function mapGoalForBackend(f: Partial<Goal>): Record<string, unknown> {
   const uomMapSend: Record<string, string> = {
     numeric: "MIN",
     percentage: "MAX",
     timeline: "TIMELINE",
     "zero-based": "ZERO_BASED",
   };
-  const body: any = {};
+  const body: Record<string, unknown> = {};
   if (f.thrustArea !== undefined) body.thrust_area = f.thrustArea;
   if (f.title !== undefined) body.title = f.title;
   if (f.description !== undefined) body.description = f.description || "";
@@ -70,25 +94,28 @@ export function mapGoalForBackend(f: Partial<Goal>) {
   return body;
 }
 
-export function mapCheckIn(b: any): CheckIn {
+export function mapCheckIn(b: unknown): CheckIn {
+  const record = asRecord(b) ?? {};
   const statusMapBack: Record<string, ProgressStatus> = {
     NOT_STARTED: "not-started",
     ON_TRACK: "on-track",
     COMPLETED: "completed",
   };
   return {
-    id: String(b.id),
-    goalId: String(b.goal_id),
-    quarter: b.quarter,
-    plannedTarget: b.planned_target,
-    actualAchievement: b.actual_achievement || 0,
-    status: statusMapBack[b.status] || "on-track",
-    managerComment: b.manager_comment || "",
-    checkinDate: b.created_at || new Date().toISOString(),
+    id: String(record.id),
+    goalId: String(record.goal_id),
+    quarter: String(record.quarter) as CheckIn["quarter"],
+    plannedTarget: Number(record.planned_target ?? 0),
+    actualAchievement: Number(record.actual_achievement ?? 0),
+    status: statusMapBack[String(record.status)] || "on-track",
+    managerComment: String(record.manager_comment ?? ""),
+    checkinDate: String(record.created_at ?? new Date().toISOString()),
   };
 }
 
-export function mapCheckInForBackend(f: any) {
+type CheckInInput = Partial<CheckIn> & { employeeComment?: string };
+
+export function mapCheckInForBackend(f: CheckInInput): Record<string, unknown> {
   const statusMapSend: Record<string, string> = {
     "not-started": "NOT_STARTED",
     "on-track": "ON_TRACK",
@@ -101,31 +128,33 @@ export function mapCheckInForBackend(f: any) {
     planned_target: Number(f.plannedTarget),
     actual_achievement: Number(f.actualAchievement || 0),
     employee_comment: f.employeeComment || "Quarterly check-in update",
-    status: statusMapSend[f.status] || "ON_TRACK",
+    status: statusMapSend[f.status || "on-track"] || "ON_TRACK",
   };
 }
 
-export function mapNotification(b: any): AppNotification {
+export function mapNotification(b: unknown): AppNotification {
+  const record = asRecord(b) ?? {};
   return {
-    id: String(b.id),
-    recipientId: String(b.recipient_id),
-    type: (b.type || "submit").toLowerCase() as NotificationType,
-    title: b.title,
-    message: b.message,
-    read: b.read || false,
-    createdAt: b.created_at || new Date().toISOString(),
+    id: String(record.id),
+    recipientId: String(record.recipient_id),
+    type: String(record.type ?? "submit").toLowerCase() as NotificationType,
+    title: String(record.title ?? ""),
+    message: String(record.message ?? ""),
+    read: Boolean(record.read),
+    createdAt: String(record.created_at ?? new Date().toISOString()),
   };
 }
 
-export function mapAuditLog(b: any): AuditLog {
+export function mapAuditLog(b: unknown): AuditLog {
+  const record = asRecord(b) ?? {};
   return {
-    id: String(b.id),
-    userId: String(b.user_id),
-    actionType: b.action_type,
-    moduleName: b.module_name,
-    oldValue: b.old_value || "",
-    newValue: b.new_value || "",
-    timestamp: b.timestamp || new Date().toISOString(),
+    id: String(record.id),
+    userId: String(record.user_id),
+    actionType: String(record.action_type ?? ""),
+    moduleName: String(record.module_name ?? ""),
+    oldValue: String(record.old_value ?? ""),
+    newValue: String(record.new_value ?? ""),
+    timestamp: String(record.timestamp ?? new Date().toISOString()),
   };
 }
 
@@ -176,7 +205,12 @@ class APIClient {
       headers,
     });
 
-    if (response.status === 401 && this.refreshToken && endpoint !== "/auth/login" && endpoint !== "/auth/refresh") {
+    if (
+      response.status === 401 &&
+      this.refreshToken &&
+      endpoint !== "/auth/login" &&
+      endpoint !== "/auth/refresh"
+    ) {
       try {
         const refreshRes = await fetch(`${API_BASE}/auth/refresh`, {
           method: "POST",
@@ -224,7 +258,7 @@ class APIClient {
     return this.request<T>(endpoint, { method: "GET", headers });
   }
 
-  post<T>(endpoint: string, body?: any, headers?: Record<string, string>) {
+  post<T>(endpoint: string, body?: unknown, headers?: Record<string, string>) {
     return this.request<T>(endpoint, {
       method: "POST",
       headers,
@@ -232,7 +266,7 @@ class APIClient {
     });
   }
 
-  patch<T>(endpoint: string, body?: any, headers?: Record<string, string>) {
+  patch<T>(endpoint: string, body?: unknown, headers?: Record<string, string>) {
     return this.request<T>(endpoint, {
       method: "PATCH",
       headers,

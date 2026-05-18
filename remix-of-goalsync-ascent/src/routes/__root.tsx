@@ -75,10 +75,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "GoalSync — Enterprise Goal Setting & Tracking" },
-      { name: "description", content: "Plan, align and track goals across your organization with GoalSync." },
+      {
+        name: "description",
+        content: "Plan, align and track goals across your organization with GoalSync.",
+      },
       { name: "author", content: "GoalSync" },
       { property: "og:title", content: "GoalSync — Enterprise Goal Setting & Tracking" },
-      { property: "og:description", content: "Plan, align and track goals across your organization." },
+      {
+        property: "og:description",
+        content: "Plan, align and track goals across your organization.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },

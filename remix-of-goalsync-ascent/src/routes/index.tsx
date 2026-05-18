@@ -10,7 +10,8 @@ export const Route = createFileRoute("/")({
           if (s.currentUserId) throw redirect({ to: "/dashboard" });
         }
       } catch (e) {
-        if ((e as any)?.isRedirect) throw e;
+        const maybeRedirect = e as { isRedirect?: boolean } | null;
+        if (maybeRedirect?.isRedirect) throw e;
       }
     }
     throw redirect({ to: "/login" });
