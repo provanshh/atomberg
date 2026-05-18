@@ -62,7 +62,7 @@ type User struct {
 
 	Manager       *User          `gorm:"foreignKey:ManagerID" json:"manager,omitempty"`
 	Employees     []User         `gorm:"foreignKey:ManagerID" json:"employees,omitempty"`
-	Goals         []Goal         `json:"goals,omitempty"`
+	Goals         []Goal         `gorm:"foreignKey:EmployeeID" json:"goals,omitempty"`
 }
 
 type Goal struct {
@@ -84,7 +84,7 @@ type Goal struct {
 	UpdatedAt        time.Time  `json:"updated_at"`
 
 	Employee   User        `gorm:"foreignKey:EmployeeID" json:"employee,omitempty"`
-	CheckIns   []CheckIn   `json:"checkins,omitempty"`
+	CheckIns   []CheckIn   `gorm:"foreignKey:GoalID" json:"checkins,omitempty"`
 }
 
 type CheckIn struct {
