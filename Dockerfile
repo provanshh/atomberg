@@ -24,7 +24,7 @@ WORKDIR /app
 ENV NODE_ENV=production
 
 RUN apt-get update \
-  && apt-get install -y --no-install-recommends postgresql \
+  && apt-get install -y --no-install-recommends postgresql-15 \
   && rm -rf /var/lib/apt/lists/* \
   && mkdir -p /var/lib/postgresql/data \
   && chown -R postgres:postgres /var/lib/postgresql
