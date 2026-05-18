@@ -1,8 +1,10 @@
 package config
 
 import (
+	"bufio"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -18,6 +20,7 @@ type Config struct {
 }
 
 func Load() Config {
+	loadDotEnv()
 	return Config{
 		Port:                 env("PORT", "8080"),
 		DatabaseURL:          env("DATABASE_URL", "postgres://postgres:postgres@localhost:5432/goalsync?sslmode=disable"),
@@ -27,6 +30,34 @@ func Load() Config {
 		CookieSecure:         envBool("COOKIE_SECURE", false),
 		FrontendOrigin:       env("FRONTEND_ORIGIN", "http://localhost:3000"),
 		RateLimitPerMinute:   envInt("RATE_LIMIT_PER_MIN", 120),
+	}
+}
+
+func loadDotEnv() {
+	file, err := os.Open(".env")
+	if err != nil {
+		return // Ignore if .env doesn't exist
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+		if line == "" || strings.HasPrefix(line, "#") {
+			continue
+		}
+		parts := strings.SplitN(line, "=", 2)
+		if len(parts) != 2 {
+			continue
+		}
+		key := strings.TrimSpace(parts[0])
+		val := strings.TrimSpace(parts[1])
+		// Remove quotes if present
+		if (strings.HasPrefix(val, "\"") && strings.HasSuffix(val, "\"")) ||
+			(strings.HasPrefix(val, "'") && strings.HasSuffix(val, "'")) {
+			val = val[1 : len(val)-1]
+		}
+		os.Setenv(key, val)
 	}
 }
 
