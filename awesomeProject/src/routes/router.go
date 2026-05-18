@@ -12,6 +12,7 @@ import (
 	"awesomeProject/src/modules/goals"
 	"awesomeProject/src/modules/users"
 	"awesomeProject/src/services"
+	"awesomeProject/src/utils"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
